@@ -1,0 +1,76 @@
+local player = game.Players.LocalPlayer
+local toggled = true
+local ScreenGui = Instance.new("ScreenGui")
+local ToggleButton = Instance.new("TextButton")
+local UIPadding = Instance.new("UIPadding")
+local UICorner = Instance.new("UICorner")
+local UIStroke = Instance.new("UIStroke")
+
+ScreenGui.Parent = game.CoreGui
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+ToggleButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Position = UDim2.new(0.784421861, 0, 0.470180852, 0) -- Перемещено на 30% выше
+ToggleButton.Size = UDim2.new(0.181641668, 0, 0.106781207, 0)
+ToggleButton.Font = Enum.Font.SourceSansSemibold
+ToggleButton.Text = "INVINCIBILITY: ON"
+ToggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+ToggleButton.TextScaled = true
+ToggleButton.TextSize = 14.000
+ToggleButton.TextWrapped = true
+
+UIPadding.Parent = ToggleButton
+UIPadding.PaddingBottom = UDim.new(0.100000001, 0)
+UIPadding.PaddingLeft = UDim.new(0.0500000007, 0)
+UIPadding.PaddingRight = UDim.new(0.0500000007, 0)
+UIPadding.PaddingTop = UDim.new(0.100000001, 0)
+
+UICorner.CornerRadius = UDim.new(0.200000003, 0)
+UICorner.Parent = ToggleButton
+UIStroke.Parent = ToggleButton
+UIStroke.Thickness = 3.100
+UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+local function toggle()
+    toggled = not toggled
+    local char = player.Character
+    if not char then return end
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.CanTouch = not toggled
+        end
+    end
+    ToggleButton.Text = "INVINCIBILITY: " .. (toggled and "ON" or "OFF")
+    ToggleButton.BackgroundColor3 = (toggled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0))
+end
+
+local function updateCharacterTouch()
+    local char = player.Character
+    if not char then return end
+    for _, v in pairs(char:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.CanTouch = not toggled
+        end
+    end
+end
+
+player.CharacterAdded:Connect(function(char)
+    updateCharacterTouch()
+    char.AncestryChanged:Connect(function(child)
+        if toggled and child:IsA("BasePart") and child:IsDescendantOf(char) then
+            child.CanTouch = false
+        end
+    end)
+end)
+
+ToggleButton.MouseButton1Click:Connect(toggle)
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Made by Zenith",
+    Text = "https://www.youtube.com/@ZenithScriptsRoblox"
+})
+
+-- Инициализация для текущего персонажа
+updateCharacterTouch()
